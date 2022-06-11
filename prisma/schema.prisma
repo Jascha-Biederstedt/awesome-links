@@ -16,7 +16,7 @@ model User {
   updatedAt DateTime @updatedAt
   email     String   @unique
   image     String?
-  role Role          @default(USER)
+  role      Role     @default(USER)
   bookmarks Link[]
 }
 
