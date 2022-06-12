@@ -1,13 +1,12 @@
 import { PrismaClient } from '@prisma/client';
-
 import { links } from '../data/links';
 
 const prisma = new PrismaClient();
 
-const main = async () => {
+async function main() {
   await prisma.user.create({
     data: {
-      email: 'testemail@gmail.com',
+      email: 'test@gmail.com',
       role: 'ADMIN',
     },
   });
@@ -15,13 +14,11 @@ const main = async () => {
   await prisma.link.createMany({
     data: links,
   });
-};
+}
 
 main()
-  .catch(error => {
-    console.error(error);
+  .catch((e) => {
+    console.error(e);
     process.exit(1);
   })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+  .finally(async () => await prisma.$disconnect);

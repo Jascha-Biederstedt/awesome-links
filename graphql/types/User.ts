@@ -1,5 +1,4 @@
 import { enumType, objectType } from 'nexus';
-
 import { Link } from './Link';
 
 export const User = objectType({
@@ -12,11 +11,11 @@ export const User = objectType({
     t.field('role', { type: Role });
     t.list.field('bookmarks', {
       type: Link,
-      async resolve(_parent, _args, ctx) {
+      async resolve(parent, _args, ctx) {
         return await ctx.prisma.user
           .findUnique({
             where: {
-              id: _parent.id,
+              id: parent.id,
             },
           })
           .bookmarks();
