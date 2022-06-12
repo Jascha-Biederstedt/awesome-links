@@ -3,14 +3,14 @@ import Cors from 'micro-cors';
 import { MicroRequest } from 'apollo-server-micro/dist/types';
 import { ServerResponse } from 'http';
 
-import { typeDefs } from '../../graphql/schema';
+import { schema } from '../../graphql/schema';
 import { resolvers } from '../../graphql/resolvers';
 import { createContext } from '../../graphql/context';
 
 const cors = Cors();
 
 const apolloServer = new ApolloServer({
-  typeDefs,
+  schema,
   resolvers,
   context: createContext,
 });
