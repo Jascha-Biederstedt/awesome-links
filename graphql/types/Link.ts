@@ -1,4 +1,4 @@
-import { nonNull, objectType, stringArg, extendType } from 'nexus';
+import { objectType, extendType } from 'nexus';
 import { connectionFromArraySlice, cursorToOffset } from 'graphql-relay';
 
 export const Link = objectType({
