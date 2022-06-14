@@ -1,4 +1,4 @@
-import { objectType, extendType, nonNull, stringArg } from 'nexus';
+import { nonNull, objectType, stringArg, extendType } from 'nexus';
 import { connectionFromArraySlice, cursorToOffset } from 'graphql-relay';
 
 export const Link = objectType({
@@ -6,6 +6,7 @@ export const Link = objectType({
   definition(t) {
     t.string('id');
     t.int('index');
+    t.int('userId');
     t.string('title');
     t.string('url');
     t.string('description');
@@ -14,6 +15,7 @@ export const Link = objectType({
   },
 });
 
+// get ALl Links
 export const LinksQuery = extendType({
   type: 'Query',
   definition(t) {
@@ -40,7 +42,26 @@ export const LinksQuery = extendType({
     });
   },
 });
+// get Unique Link
+export const LinkByIDQuery = extendType({
+  type: 'Query',
+  definition(t) {
+    t.nonNull.field('link', {
+      type: 'Link',
+      args: { id: nonNull(stringArg()) },
+      resolve(_parent, args, ctx) {
+        const link = ctx.prisma.link.findUnique({
+          where: {
+            id: args.id,
+          },
+        });
+        return link;
+      },
+    });
+  },
+});
 
+// create link
 export const CreateLinkMutation = extendType({
   type: 'Mutation',
   definition(t) {
@@ -54,20 +75,14 @@ export const CreateLinkMutation = extendType({
         description: nonNull(stringArg()),
       },
       async resolve(_parent, args, ctx) {
-        if (!ctx.user) {
-          throw new Error(`You need to be logged in to perform an action`);
-        }
-
         const user = await ctx.prisma.user.findUnique({
           where: {
             email: ctx.user.email,
           },
         });
-
-        if (user.role !== 'ADMIN') {
+        if (!user || user.role !== 'ADMIN') {
           throw new Error(`You do not have permission to perform action`);
         }
-
         const newLink = {
           title: args.title,
           url: args.url,
@@ -78,6 +93,53 @@ export const CreateLinkMutation = extendType({
 
         return await ctx.prisma.link.create({
           data: newLink,
+        });
+      },
+    });
+  },
+});
+
+// update Link
+export const UpdateLinkMutation = extendType({
+  type: 'Mutation',
+  definition(t) {
+    t.nonNull.field('updateLink', {
+      type: 'Link',
+      args: {
+        id: stringArg(),
+        title: stringArg(),
+        url: stringArg(),
+        imageUrl: stringArg(),
+        category: stringArg(),
+        description: stringArg(),
+      },
+      resolve(_parent, args, ctx) {
+        return ctx.prisma.link.update({
+          where: { id: args.id },
+          data: {
+            title: args.title,
+            url: args.url,
+            imageUrl: args.imageUrl,
+            category: args.category,
+            description: args.description,
+          },
+        });
+      },
+    });
+  },
+});
+// // delete Link
+export const DeleteLinkMutation = extendType({
+  type: 'Mutation',
+  definition(t) {
+    t.nonNull.field('deleteLink', {
+      type: 'Link',
+      args: {
+        id: nonNull(stringArg()),
+      },
+      resolve(_parent, args, ctx) {
+        return ctx.prisma.link.delete({
+          where: { id: args.id },
         });
       },
     });

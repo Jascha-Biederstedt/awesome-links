@@ -31,22 +31,18 @@ const CreateLinkMutation = gql`
 `;
 
 const Admin = () => {
+  const [createLink, { data, loading, error }] =
+    useMutation(CreateLinkMutation);
   const {
     register,
     handleSubmit,
     formState: { errors },
-    reset,
   } = useForm();
 
-  const [createLink, { loading, error }] = useMutation(CreateLinkMutation, {
-    onCompleted: () => reset(),
-  });
-
   const onSubmit = async data => {
-    const { title, url, category, description } = data;
-    const imageUrl = `https://via.placeholder.com/300`;
+    const { title, url, category, description, image } = data;
+    const imageUrl = `https://${process.env.NEXT_PUBLIC_AWS_S3_BUCKET_NAME}.s3.amazonaws.com/${image[0].name}`;
     const variables = { title, url, category, description, imageUrl };
-
     try {
       toast.promise(createLink({ variables }), {
         loading: 'Creating new link..',
@@ -76,7 +72,6 @@ const Admin = () => {
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
           />
         </label>
-
         <label className="block">
           <span className="text-gray-700">Description</span>
           <input
@@ -87,7 +82,6 @@ const Admin = () => {
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
           />
         </label>
-
         <label className="block">
           <span className="text-gray-700">Url</span>
           <input
@@ -98,7 +92,6 @@ const Admin = () => {
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
           />
         </label>
-
         <label className="block">
           <span className="text-gray-700">Category</span>
           <input
